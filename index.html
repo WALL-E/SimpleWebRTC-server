@@ -74,6 +74,9 @@
         <script src="simplewebrtc.bundle.js"></script>
         <script>
         $(function () {
+            // TODO Сделать переключение комнаты в одной сессии пользователя
+            // TODO Красиво все заверстать
+
             var reRoom = /^#?room\/([A-Za-z0-9\-_\.@]+)$/;
 
             // grab the room from the URL
@@ -102,7 +105,9 @@
                 // the id/element dom element that will hold remote videos
                 remoteVideosEl: 'remotes',
                 // immediately ask for camera access
-                autoRequestMedia: true
+                autoRequestMedia: true,
+
+                url: '/'
             });
 
             webrtc.on('localVideo', function () {

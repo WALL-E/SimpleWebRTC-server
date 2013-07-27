@@ -33,13 +33,11 @@ function spyOn(connection) {
     };
 }
 
-// TODO Сделать переключение комнаты в одной сессии пользователя
-
 function SimpleWebRTC(opts) {
     var self = this;
     var options = opts || {};
     var config = this.config = {
-            url: ['http://signaling.simplewebrtc.com:8888', '/'][1],
+            url: 'http://signaling.simplewebrtc.com:8888',
             log: options.log,
             localVideoEl: '',
             remoteVideosEl: '',
