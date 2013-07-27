@@ -35,6 +35,8 @@ function spyOn(connection) {
     };
 }
 
+// TODO Сделать переключение комнаты в одной сессии пользователя
+
 function SimpleWebRTC(opts) {
     var self = this;
     var options = opts || {};
@@ -273,8 +275,6 @@ SimpleWebRTC.prototype.getLocalVideoContainer = function () {
         var video = document.createElement('video');
         el.appendChild(video);
         return video;
-    } else {
-        return;
     }
 };
 
@@ -605,7 +605,7 @@ module.exports = function (cb) {
     getUserMedia(constraints, cb);
 };
 
-},{"getusermedia":7}],8:[function(require,module,exports){
+},{"getusermedia":7}],7:[function(require,module,exports){
 // getUserMedia helper by @HenrikJoreteg
 var func = (navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
@@ -669,7 +669,7 @@ module.exports = function (constraints, cb) {
     });
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 // getUserMedia helper by @HenrikJoreteg
 var func = (navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
