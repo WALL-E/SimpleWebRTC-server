@@ -15,10 +15,11 @@
     "socket.io-client": "0.9.16",
     "attachmediastream": "1.0.0",
     "hark": "0.1.1",
-    "webrtc": "0.3.0"
+    "webrtc": "0.3.0",
+    "socket.io": "0.9.11",
+    "express": "3.x.x"
   },
   "devDependencies": {
-    "express": "3.x.x",
     "browserify": "2.22.0",
     "request": "",
     "uglify-js": "2.3.6"
