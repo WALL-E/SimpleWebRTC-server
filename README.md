@@ -2,7 +2,7 @@
 
 ## Running example
 
-```js
+```
 $ git clone git://github.com/azproduction/SimpleWebRTC.git
 $ cd SimpleWebRTC
 $ npm i
