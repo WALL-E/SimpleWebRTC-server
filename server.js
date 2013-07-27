@@ -1,19 +1,78 @@
-// silly chrome wants SSL to do screensharing
 var fs = require('fs'),
-    express = require('express'),
-    https = require('https'),
-    http = require('http');
-
-
-var privateKey = fs.readFileSync('fakekeys/privatekey.pem').toString(),
-    certificate = fs.readFileSync('fakekeys/certificate.pem').toString();
-
+    express = require('express');
 
 var app = express();
-
 app.use(express.static(__dirname));
 
-https.createServer({key: privateKey, cert: certificate}, app).listen(8000);
-http.createServer(app).listen(8001);
+var server = require('http').createServer(app),
+    io = require('socket.io').listen(server);
 
-console.log('running on https://localhost:8000 and http://localhost:8001');
+var rooms = {};
+
+io.sockets.on('connection', function (client) {
+    function getRoom(channel) {
+        return rooms[channel] = rooms[channel] || { clients: {} };
+    }
+
+    function joinTo(channel) {
+        var room = getRoom(channel);
+
+        // add self
+        room.clients[client.id] = {
+            audio: false,
+            screen: false,
+            video: true
+        };
+
+        client.channel = channel;
+    }
+
+    function leave(channel) {
+        channel = channel || client.channel;
+        var room = getRoom(channel);
+
+        // remove client from room
+        delete room.clients[client.id];
+
+        // remove room if no clients
+        if (!Object.keys(room).length) {
+            delete rooms[channel];
+        }
+
+        // notify others
+        client.broadcast.emit('remove', {
+            id: client.id
+        });
+    }
+
+    client.on('join', function (channel, fn) {
+        // send others
+        fn(null, getRoom(channel));
+
+        // add self
+        joinTo(channel);
+    });
+
+    client.on('leave', leave);
+    client.on('disconnect', leave);
+
+    client.on('create', function (channel, fn) {
+        // send channel
+        fn(null, channel);
+
+        // add self
+        joinTo(channel);
+    });
+
+    // shareScreen unshareScreen
+
+    // forward messages
+    client.on('message', function (message) {
+        message.from = client.id;
+        io.sockets.socket(message.to).emit('message', message);
+    });
+});
+
+server.listen(8001, '0.0.0.0');
+
+console.log('running on http://localhost:8001');
