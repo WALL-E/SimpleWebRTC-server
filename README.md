@@ -1,52 +1,19 @@
-# SimpleWebRTC - World's easiest WebRTC lib
+# WebRTC signaling server for SimpleWebRTC
 
-Check out the demo: https://talky.io
-
-
-## It's so easy:
-
-### 1. Some basic html
-
-```html
-<!DOCTYPE html>
-<html>
-    <head>
-        <script src="http://simplewebrtc.com/latest.js"></script> 
-    </head>
-    <body>
-        <div id="localVideo"></div>
-        <div id="remotesVideos"></div>
-    </body>
-</html>
-
-```
-
-### 1. Create our WebRTC object
+## Running example
 
 ```js
-var webrtc = new WebRTC({
-    // the id/element dom element that will hold "our" video
-    localVideoEl: 'localVideo',
-    // the id/element dom element that will hold remote videos
-    remoteVideosEl: 'remotesVideos',
-    // immediately ask for camera access
-    autoRequestMedia: true
-});
+$ git clone git://github.com/azproduction/SimpleWebRTC.git
+$ cd SimpleWebRTC
+$ npm i
+$ node server
 ```
 
-### 2. Tell it to join a room when ready
-
-```js
-// we have to wait until it's ready
-webrtc.on('readyToCall', function () {
-    // you can name it anything
-    webrtc.joinRoom('your awesome room name');
-});
-```
+ - Open `http://localhost:8001/#room/webrtc` on multiple devices. That's it!
+ - Both signaling and static servers are will be listening `0.0.0.0:8001` interface.
+ - It takes about 5 seconds to establish a connection.
 
 ### Available Options
 
-
-`peerConnectionConfig` - Set this to specify your own STUN and TURN servers. SimpleWebRTC uses Google's public STUN server by default: `stun.l.google.com:19302`. It's intended for public use according to: https://twitter.com/HenrikJoreteg/status/354105684591251456
-
-
+ - `peerConnectionConfig` - Set this to specify your own STUN and TURN servers. SimpleWebRTC uses Google's public STUN server by
+ default: `stun.l.google.com:19302`. It's intended for public use according to: https://twitter.com/HenrikJoreteg/status/354105684591251456

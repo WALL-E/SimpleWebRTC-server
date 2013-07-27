@@ -1,5 +1,26 @@
 var fs = require('fs'),
-    express = require('express');
+    express = require('express'),
+    os = require('os');
+
+function remoteIp() {
+    var interfaces = os.networkInterfaces(),
+        ipv4 = [],
+        ipv6 = [];
+
+    Object.keys(interfaces).forEach(function (interfaceName) {
+        interfaces[interfaceName].forEach(function (interfaceInfo) {
+            if (!interfaceInfo.internal) {
+                if (interfaceInfo.family === 'IPv4') {
+                    ipv4.push(interfaceInfo.address);
+                } else {
+                    ipv6.push(interfaceInfo.address);
+                }
+            }
+        });
+    });
+
+    return ipv4.concat(ipv6);
+}
 
 var app = express();
 app.use(express.static(__dirname));
@@ -78,6 +99,5 @@ io.sockets.on('connection', function (client) {
     });
 });
 
+console.log('Browse http://localhost:8001 or http://' + remoteIp()[0] + ':8001');
 server.listen(8001, '0.0.0.0');
-
-console.log('running on http://localhost:8001');

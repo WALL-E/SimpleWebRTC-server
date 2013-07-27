@@ -4,35 +4,6 @@ var webrtcSupport = require('webrtcsupport');
 var attachMediaStream = require('attachmediastream');
 var getScreenMedia = require('getscreenmedia');
 
-function dir(name, data) {
-    console.log(name, data);
-}
-
-function sniff(func, self, name) {
-    return function () {
-        dir(name, arguments);
-        return func.apply(self, arguments);
-    }
-}
-
-function spyOn(connection) {
-    var _on = connection.on;
-    var _emit = connection.emit;
-    var clientId = Math.random().toString(16).slice(2, 6);
-
-    connection.emit = function (name, data, cb) {
-        dir(clientId + ': emit > ' + name, data);
-        if (cb) {
-            cb = sniff(cb, null, clientId + ': emit < ' + name);
-        }
-        return _emit.call(connection, name, data, cb);
-    };
-
-    connection.on = function (name, cb) {
-        return _on.call(connection, name, sniff(cb, null, clientId + ': event < ' + name));
-    };
-}
-
 function SimpleWebRTC(opts) {
     var self = this;
     var options = opts || {};
@@ -61,8 +32,6 @@ function SimpleWebRTC(opts) {
 
     // our socket.io connection
     connection = this.connection = io.connect(this.config.url);
-
-    spyOn(connection);
 
     connection.on('connect', function () {
         self.emit('ready', connection.socket.sessionid);
@@ -247,7 +216,6 @@ SimpleWebRTC.prototype.getEl = function (idOrEl) {
 SimpleWebRTC.prototype.startLocalVideo = function () {
     var self = this;
     this.webrtc.startLocalMedia(null, function (err, stream) {
-        //console.log('starting local media', err, stream);
         if (err) {
             self.emit(err);
         } else {
