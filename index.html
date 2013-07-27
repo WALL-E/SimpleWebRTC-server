@@ -31,42 +31,56 @@
                 height: 150px;
             }
 
-            #table_remotes,
             #remotes {
-                text-align: center;
                 width: 100%;
                 height: 100%;
             }
 
-            #remotes video {
-                max-height: 50%;
-                max-width: 50%;
-                margin: 1%;
+            #remotes {
+                display: -moz-flex;
+                display: flex;
+
+                -moz-align-items: center;
+                     align-items: center;
+
+                -moz-box-sizing: border-box;
+                     box-sizing: border-box;
+
+                -moz-box-justify-content: space-between;
+                         justify-content: space-between;
             }
 
-            form {
+            #remotes video {
+                margin: auto;
+                padding: 1%;
+                max-height: 100%;
+
+                -moz-box-sizing: border-box;
+                     box-sizing: border-box;
+            }
+
+            #statusbar {
                 position: fixed;
                 top: 5px;
+                left: 5px;
                 display: block;
                 opacity: .3;
+
                 -webkit-transition: opacity 0.5s ease;
                    -moz-transition: opacity 0.5s ease;
                         transition: opacity 0.5s ease;
 
             }
 
-            form:hover {
+            #statusbar:hover {
                 opacity: 1;
             }
         </style>
-        <form>
-            <label for="sessionInput">Current channel
-             <input id="sessionInput"/>
-            </label>
+        <div id="statusbar">
+            <button id="changeChannel">Select room</button>
             Status <span id="status"></span>
-        </form>
-        <table cellspacing="0" cellpadding="0" id="table_remotes"><tr><td id="remotes">
-        </td></tr></table>
+        </div>
+        <div id="remotes"></div>
         <video id="localVideo"></video>
 
         <script src="//yandex.st/jquery/1.8.3/jquery.min.js"></script>
@@ -74,23 +88,27 @@
         <script src="simplewebrtc.bundle.js"></script>
         <script>
         $(function () {
-            // TODO Сделать переключение комнаты в одной сессии пользователя
-            // TODO Красиво все заверстать
-
             var reRoom = /^#?room\/([A-Za-z0-9\-_\.@]+)$/;
 
             // grab the room from the URL
             var room = (location.hash.match(reRoom) || 0)[1] || '';
 
-            var $form = $('form'),
-                $roomName = $('#sessionInput').val(room),
+            var $changeChannel = $('#changeChannel'),
                 $status = $('#status'),
                 $localVideo = $('#localVideo').hide();
 
-            $form.submit(function () {
-                var name = $roomName.val().toLowerCase().replace(/\s/g, '-').replace(/[^A-Za-z0-9_\-\.]/g, '');
-                webrtc.createRoom(name, function () {
+            $changeChannel.click(function () {
+                var name = prompt('Change room', room) || '';
+                name = name.toLowerCase().replace(/\s/g, '-').replace(/[^A-Za-z0-9_\-\.]/g, '');
+
+                if (name === room) {
+                    return false;
+                }
+
+                webrtc.leaveRoom();
+                webrtc.joinRoom(name, function () {
                     location.hash = 'room/' + name;
+                    room = name;
                 });
 
                 return false;

@@ -20,7 +20,7 @@ function sniff(func, self, name) {
 function spyOn(connection) {
     var _on = connection.on;
     var _emit = connection.emit;
-    var clientId = Math.random().toString(16)[2];
+    var clientId = Math.random().toString(16).slice(2, 6);
 
     connection.emit = function (name, data, cb) {
         dir(clientId + ': emit > ' + name, data);
@@ -34,6 +34,8 @@ function spyOn(connection) {
         return _on.call(connection, name, sniff(cb, null, clientId + ': event < ' + name));
     };
 }
+
+// TODO Сделать переключение комнаты в одной сессии пользователя
 
 function SimpleWebRTC(opts) {
     var self = this;
@@ -153,7 +155,7 @@ SimpleWebRTC.prototype = Object.create(WildEmitter.prototype, {
 SimpleWebRTC.prototype.leaveRoom = function () {
     if (this.roomName) {
         this.connection.emit('leave', this.roomName);
-        this.peers.forEach(function (peer) {
+        this.webrtc.peers.forEach(function (peer) {
             peer.end();
         });
     }
@@ -375,7 +377,34 @@ SimpleWebRTC.prototype.createRoom = function (name, cb) {
 
 module.exports = SimpleWebRTC;
 
-},{"attachmediastream":5,"getscreenmedia":6,"webrtc":2,"webrtcsupport":4,"wildemitter":3}],3:[function(require,module,exports){
+},{"attachmediastream":5,"getscreenmedia":6,"webrtc":2,"webrtcsupport":4,"wildemitter":3}],4:[function(require,module,exports){
+// created by @HenrikJoreteg
+var PC = window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection;
+var IceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
+var SessionDescription = window.mozRTCSessionDescription || window.RTCSessionDescription;
+var prefix = function () {
+    if (window.mozRTCPeerConnection) {
+        return 'moz';
+    } else if (window.webkitRTCPeerConnection) {
+        return 'webkit';
+    }
+}();
+var screenSharing = navigator.userAgent.match('Chrome') && parseInt(navigator.userAgent.match(/Chrome\/(.*) /)[1], 10) >= 26;
+var webAudio = !!window.webkitAudioContext;
+
+// export support flags and constructors.prototype && PC
+module.exports = {
+    support: !!PC,
+    dataChannel: !!(PC && PC.prototype && PC.prototype.createDataChannel),
+    prefix: prefix,
+    webAudio: webAudio,
+    screenSharing: screenSharing,
+    PeerConnection: PC,
+    SessionDescription: SessionDescription,
+    IceCandidate: IceCandidate
+};
+
+},{}],3:[function(require,module,exports){
 /*
 WildEmitter.js is a slim little event emitter by @henrikjoreteg largely based 
 on @visionmedia's Emitter from UI Kit.
@@ -512,33 +541,6 @@ WildEmitter.prototype.getWildcardCallbacks = function (eventName) {
     return result;
 };
 
-},{}],4:[function(require,module,exports){
-// created by @HenrikJoreteg
-var PC = window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection;
-var IceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
-var SessionDescription = window.mozRTCSessionDescription || window.RTCSessionDescription;
-var prefix = function () {
-    if (window.mozRTCPeerConnection) {
-        return 'moz';
-    } else if (window.webkitRTCPeerConnection) {
-        return 'webkit';
-    }
-}();
-var screenSharing = navigator.userAgent.match('Chrome') && parseInt(navigator.userAgent.match(/Chrome\/(.*) /)[1], 10) >= 26;
-var webAudio = !!window.webkitAudioContext;
-
-// export support flags and constructors.prototype && PC
-module.exports = {
-    support: !!PC,
-    dataChannel: !!(PC && PC.prototype && PC.prototype.createDataChannel),
-    prefix: prefix,
-    webAudio: webAudio,
-    screenSharing: screenSharing,
-    PeerConnection: PC,
-    SessionDescription: SessionDescription,
-    IceCandidate: IceCandidate
-};
-
 },{}],5:[function(require,module,exports){
 module.exports = function (stream, el, options) {
     var URL = window.URL;
@@ -604,6 +606,70 @@ module.exports = function (cb) {
 };
 
 },{"getusermedia":7}],8:[function(require,module,exports){
+// getUserMedia helper by @HenrikJoreteg
+var func = (navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia ||
+            navigator.msGetUserMedia);
+
+
+module.exports = function (constraints, cb) {
+    var options;
+    var haveOpts = arguments.length === 2;
+    var defaultOpts = {video: true, audio: true};
+    var error;
+    var denied = 'PERMISSION_DENIED';
+    var notSatified = 'CONSTRAINT_NOT_SATISFIED';
+
+    // make constraints optional
+    if (!haveOpts) {
+        cb = constraints;
+        constraints = defaultOpts;
+    }
+
+    // treat lack of browser support like an error
+    if (!func) {
+        // throw proper error per spec
+        error = new Error('NavigatorUserMediaError');
+        error.name = 'NOT_SUPPORTED_ERROR';
+        return cb(error);
+    }
+
+    func.call(navigator, constraints, function (stream) {
+        cb(null, stream);
+    }, function (err) {
+        var error;
+        // coerce into an error object since FF gives us a string
+        // there are only two valid names according to the spec
+        // we coerce all non-denied to "constraint not satisfied".
+        if (typeof err === 'string') {
+            error = new Error('NavigatorUserMediaError');
+            if (err === denied) {
+                error.name = denied;
+            } else {
+                error.name = notSatified;
+            }
+        } else {
+            // if we get an error object make sure '.name' property is set
+            // according to spec: http://dev.w3.org/2011/webrtc/editor/getusermedia.html#navigatorusermediaerror-and-navigatorusermediaerrorcallback
+            error = err;
+            if (!error.name) {
+                // this is likely chrome which
+                // sets a property called "ERROR_DENIED" on the error object
+                // if so we make sure to set a name
+                if (error[denied]) {
+                    err.name = denied;
+                } else {
+                    err.name = notSatified;
+                }
+            }
+        }
+
+        cb(error);
+    });
+};
+
+},{}],7:[function(require,module,exports){
 // getUserMedia helper by @HenrikJoreteg
 var func = (navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
@@ -994,71 +1060,7 @@ Peer.prototype.handleStreamRemoved = function () {
 
 module.exports = WebRTC;
 
-},{"getusermedia":8,"hark":10,"rtcpeerconnection":9,"webrtcsupport":4,"wildemitter":3}],7:[function(require,module,exports){
-// getUserMedia helper by @HenrikJoreteg
-var func = (navigator.getUserMedia ||
-            navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia ||
-            navigator.msGetUserMedia);
-
-
-module.exports = function (constraints, cb) {
-    var options;
-    var haveOpts = arguments.length === 2;
-    var defaultOpts = {video: true, audio: true};
-    var error;
-    var denied = 'PERMISSION_DENIED';
-    var notSatified = 'CONSTRAINT_NOT_SATISFIED';
-
-    // make constraints optional
-    if (!haveOpts) {
-        cb = constraints;
-        constraints = defaultOpts;
-    }
-
-    // treat lack of browser support like an error
-    if (!func) {
-        // throw proper error per spec
-        error = new Error('NavigatorUserMediaError');
-        error.name = 'NOT_SUPPORTED_ERROR';
-        return cb(error);
-    }
-
-    func.call(navigator, constraints, function (stream) {
-        cb(null, stream);
-    }, function (err) {
-        var error;
-        // coerce into an error object since FF gives us a string
-        // there are only two valid names according to the spec
-        // we coerce all non-denied to "constraint not satisfied".
-        if (typeof err === 'string') {
-            error = new Error('NavigatorUserMediaError');
-            if (err === denied) {
-                error.name = denied;
-            } else {
-                error.name = notSatified;
-            }
-        } else {
-            // if we get an error object make sure '.name' property is set
-            // according to spec: http://dev.w3.org/2011/webrtc/editor/getusermedia.html#navigatorusermediaerror-and-navigatorusermediaerrorcallback
-            error = err;
-            if (!error.name) {
-                // this is likely chrome which
-                // sets a property called "ERROR_DENIED" on the error object
-                // if so we make sure to set a name
-                if (error[denied]) {
-                    err.name = denied;
-                } else {
-                    err.name = notSatified;
-                }
-            }
-        }
-
-        cb(error);
-    });
-};
-
-},{}],9:[function(require,module,exports){
+},{"getusermedia":8,"hark":10,"rtcpeerconnection":9,"webrtcsupport":4,"wildemitter":3}],9:[function(require,module,exports){
 var WildEmitter = require('wildemitter');
 var webrtc = require('webrtcsupport');
 

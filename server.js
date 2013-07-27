@@ -15,6 +15,9 @@ io.sockets.on('connection', function (client) {
     }
 
     function joinTo(channel) {
+        if (client.channel === channel) {
+            return;
+        }
         var room = getRoom(channel);
 
         // add self
@@ -31,18 +34,20 @@ io.sockets.on('connection', function (client) {
         channel = channel || client.channel;
         var room = getRoom(channel);
 
-        // remove client from room
+        // remove current client from room
         delete room.clients[client.id];
+
+        // notify other peers but not self in current channel
+        Object.keys(room.clients).forEach(function (client_id) {
+            io.sockets.socket(client_id).emit('remove', {
+                id: client.id
+            });
+        });
 
         // remove room if no clients
         if (!Object.keys(room).length) {
             delete rooms[channel];
         }
-
-        // notify others
-        client.broadcast.emit('remove', {
-            id: client.id
-        });
     }
 
     client.on('join', function (channel, fn) {

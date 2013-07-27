@@ -18,7 +18,7 @@ function sniff(func, self, name) {
 function spyOn(connection) {
     var _on = connection.on;
     var _emit = connection.emit;
-    var clientId = Math.random().toString(16)[2];
+    var clientId = Math.random().toString(16).slice(2, 6);
 
     connection.emit = function (name, data, cb) {
         dir(clientId + ': emit > ' + name, data);
@@ -32,6 +32,8 @@ function spyOn(connection) {
         return _on.call(connection, name, sniff(cb, null, clientId + ': event < ' + name));
     };
 }
+
+// TODO Сделать переключение комнаты в одной сессии пользователя
 
 function SimpleWebRTC(opts) {
     var self = this;
@@ -151,7 +153,7 @@ SimpleWebRTC.prototype = Object.create(WildEmitter.prototype, {
 SimpleWebRTC.prototype.leaveRoom = function () {
     if (this.roomName) {
         this.connection.emit('leave', this.roomName);
-        this.peers.forEach(function (peer) {
+        this.webrtc.peers.forEach(function (peer) {
             peer.end();
         });
     }
