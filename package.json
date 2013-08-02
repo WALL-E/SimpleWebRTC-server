@@ -11,6 +11,7 @@
     "dependencies": {
         "simplewebrtc": "= 0.6.0",
         "socket.io": "0.9.16",
-        "express": "3.x.x"
+        "express": "3.x.x",
+        "ip": "= 0.1.0"
     }
 }

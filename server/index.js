@@ -1,42 +1,36 @@
 var fs = require('fs'),
     path = require('path'),
     express = require('express'),
-    os = require('os');
+    ip = require('ip'),
+    os = require('os'),
+    http = require('http'),
+    socketIo = require('socket.io');
 
-function remoteIp() {
-    var interfaces = os.networkInterfaces(),
-        ipv4 = [],
-        ipv6 = [];
-
-    Object.keys(interfaces).forEach(function (interfaceName) {
-        interfaces[interfaceName].forEach(function (interfaceInfo) {
-            if (!interfaceInfo.internal) {
-                if (interfaceInfo.family === 'IPv4') {
-                    ipv4.push(interfaceInfo.address);
-                } else {
-                    ipv6.push(interfaceInfo.address);
-                }
-            }
-        });
-    });
-
-    return ipv4.concat(ipv6);
-}
+var host = '0.0.0.0',
+    port = 8001;
 
 var app = express();
 app.use(express.static(path.join(__dirname, '..', 'www')));
 app.use('/simplewebrtc', express.static(path.join(__dirname, '..', 'node_modules', 'simplewebrtc')));
 
-var server = require('http').createServer(app),
-    io = require('socket.io').listen(server);
+var server = http.createServer(app),
+    io = socketIo.listen(server);
 
 var rooms = {};
 
 io.sockets.on('connection', function (client) {
+    /**
+     * Returns or creates room descriptor
+     * @param {String} channel channel/room name
+     */
     function getRoom(channel) {
         return rooms[channel] = rooms[channel] || { clients: {} };
     }
 
+    /**
+     * Joins room
+     * @param {String} channel channel/room name
+     */
     function joinTo(channel) {
         if (client.channel === channel) {
             return;
@@ -53,6 +47,10 @@ io.sockets.on('connection', function (client) {
         client.channel = channel;
     }
 
+    /**
+     * Leaves room
+     * @param {String} [channel] channel/room name
+     */
     function leave(channel) {
         channel = channel || client.channel;
         var room = getRoom(channel);
@@ -74,10 +72,10 @@ io.sockets.on('connection', function (client) {
     }
 
     client.on('join', function (channel, fn) {
-        // send others
+        // send list of other clients in that room
         fn(null, getRoom(channel));
 
-        // add self
+        // then add self to that room
         joinTo(channel);
     });
 
@@ -85,14 +83,12 @@ io.sockets.on('connection', function (client) {
     client.on('disconnect', leave);
 
     client.on('create', function (channel, fn) {
-        // send channel
+        // send channel name back
         fn(null, channel);
 
-        // add self
+        // then add self to that room
         joinTo(channel);
     });
-
-    // shareScreen unshareScreen
 
     // forward messages
     client.on('message', function (message) {
@@ -101,5 +97,5 @@ io.sockets.on('connection', function (client) {
     });
 });
 
-console.log('Browse http://localhost:8001 or http://' + remoteIp()[0] + ':8001');
-server.listen(8001, '0.0.0.0');
+console.log('Browse http://localhost:%s/#room/webrtc or http://%s:%s/#room/webrtc', port, ip.address(), port);
+server.listen(port, host);
