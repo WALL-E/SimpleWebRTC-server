@@ -1,0 +1,70 @@
+html, body {
+    padding: 0;
+    margin: 0;
+
+    height: 100%;
+    width: 100%;
+
+    background: #000;
+
+    color: #fff;
+    font-family: Consolas, monospace;
+}
+
+input, button {
+    font-family: Consolas, monospace;
+}
+
+#localVideo {
+    position: fixed;
+
+    right: 5px;
+    bottom: 5px;
+
+    height: 150px;
+}
+
+#remotes {
+    width: 100%;
+    height: 100%;
+}
+
+#remotes {
+    display: -moz-flex;
+    display: flex;
+
+    -moz-align-items: center;
+         align-items: center;
+
+    -moz-box-sizing: border-box;
+         box-sizing: border-box;
+
+    -moz-box-justify-content: space-between;
+             justify-content: space-between;
+}
+
+#remotes video {
+    margin: auto;
+    padding: 1%;
+    max-height: 100%;
+
+    -moz-box-sizing: border-box;
+         box-sizing: border-box;
+}
+
+#statusbar {
+    position: fixed;
+    top: 5px;
+    left: 5px;
+    display: block;
+    opacity: .3;
+
+    -webkit-transition: opacity 0.5s ease;
+       -moz-transition: opacity 0.5s ease;
+            transition: opacity 0.5s ease;
+
+}
+
+#statusbar:hover {
+    opacity: 1;
+}

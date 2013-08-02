@@ -3,8 +3,8 @@
 ## Running example
 
 ```
-$ git clone git://github.com/azproduction/SimpleWebRTC.git
-$ cd SimpleWebRTC
+$ git clone git://github.com/azproduction/SimpleWebRTC-server.git
+$ cd SimpleWebRTC-server
 $ npm i
 $ node server
 ```

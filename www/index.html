@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SimpleWebRTC Server Demo</title>
+        <link rel="stylesheet" href="/index.css"/>
+    </head>
+    <body>
+        <div id="statusbar">
+            <button id="changeChannel">Select room</button>
+            Status <span id="status"></span>
+        </div>
+        <div id="remotes"></div>
+        <video id="localVideo"></video>
+
+        <script src="//yandex.st/jquery/1.8.3/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/simplewebrtc/simplewebrtc.bundle.js"></script>
+        <script src="/index.js"></script>
+    </body>
+</html>
