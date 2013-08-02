@@ -1,6 +1,6 @@
 # WebRTC signaling server for SimpleWebRTC
 
-This is private signaling WebRTC server demo it does not depend on `signaling.simplewebrtc.com:8888`.
+This is private signaling WebRTC server demo. It does not depend on `signaling.simplewebrtc.com:8888`.
 
 ## Running demo
 
