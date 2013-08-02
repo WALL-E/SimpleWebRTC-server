@@ -10,7 +10,7 @@
     "description": "Server for world's easiest webrtc",
     "dependencies": {
         "simplewebrtc": "= 0.6.0",
-        "socket.io": "0.9.11",
+        "socket.io": "0.9.16",
         "express": "3.x.x"
     }
 }
