@@ -1,6 +1,10 @@
 # WebRTC signaling server for SimpleWebRTC
 
-## Running example
+This is private signaling WebRTC server demo it does not depend on `signaling.simplewebrtc.com:8888`.
+
+## Running demo
+
+**Important** It works perfectly in Firefox 22. Other browsers does not fully support WebRTC or getUserMedia DOM APIs.
 
 ```
 $ git clone git://github.com/azproduction/SimpleWebRTC-server.git
