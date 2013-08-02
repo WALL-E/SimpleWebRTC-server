@@ -24,8 +24,8 @@ function remoteIp() {
 }
 
 var app = express();
-app.use(express.static(path.join(__dirname, 'www')));
-app.use('/simplewebrtc', express.static(path.join(__dirname, 'node_modules', 'simplewebrtc')));
+app.use(express.static(path.join(__dirname, '..', 'www')));
+app.use('/simplewebrtc', express.static(path.join(__dirname, '..', 'node_modules', 'simplewebrtc')));
 
 var server = require('http').createServer(app),
     io = require('socket.io').listen(server);
