@@ -4,7 +4,9 @@ This is private signaling WebRTC server demo. It does not depend on `signaling.s
 
 ## Running demo
 
-**Important** It works perfectly in Firefox 22. Other browsers does not fully support WebRTC or getUserMedia DOM APIs.
+**Important** 
+It works perfectly in Firefox 32 and Chrome 38. 
+Other browsers does not fully support WebRTC or getUserMedia DOM APIs.
 
 ```
 $ git clone git://github.com/azproduction/SimpleWebRTC-server.git
