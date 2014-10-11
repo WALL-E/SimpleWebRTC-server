@@ -5,7 +5,7 @@ This is private signaling WebRTC server demo. It does not depend on `signaling.s
 ## Running demo
 
 **Important** 
-It works perfectly in Firefox 32 and Chrome 38. 
+It works perfectly in Firefox 32 and Chrome 34. 
 Other browsers does not fully support WebRTC or getUserMedia DOM APIs.
 
 ```
