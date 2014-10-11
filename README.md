@@ -23,3 +23,18 @@ $ node server
 
  - `peerConnectionConfig` - Set this to specify your own STUN and TURN servers. SimpleWebRTC uses Google's public STUN server by
  default: `stun.l.google.com:19302`. It's intended for public use according to: https://twitter.com/HenrikJoreteg/status/354105684591251456
+
+国内的话，最好使用自己的stun服务器。原因，你懂的。.
+
+================================================
+Ubuntu:
+安装服务器
+sudo apt-get install stun
+配置服务器,必须配置两个IP地址，不然，无法启动
+/etc/default/stun
+测试stun服务
+stun server_ip
+
+改完之后，修改相应的配置文件即可。
+
+
