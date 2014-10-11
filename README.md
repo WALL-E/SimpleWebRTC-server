@@ -32,9 +32,12 @@ Ubuntu:
 sudo apt-get install stun
 配置服务器,必须配置两个IP地址，不然，无法启动
 /etc/default/stun
+启动stun服务器
+/etc/init.d/stun start
 测试stun服务
 stun server_ip
 
-改完之后，修改相应的配置文件即可。
+服务器搭建完之后，修改simplewebrtc/simplewebrtc.bundle.js文件即可。
+`peerConnectionConfig` - 修改这个配置段即可，之后浏览器刷新即可使用新的Stun服务器了
 
 
