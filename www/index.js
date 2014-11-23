@@ -9,7 +9,7 @@ $(function () {
         $localVideo = $('#localVideo').hide();
 
     $changeChannel.click(function () {
-        var name = prompt('Change room', room) || '';
+        var name = prompt('请输入房间号(名称)', room) || '';
         name = name.toLowerCase().replace(/\s/g, '-').replace(/[^A-Za-z0-9_\-\.]/g, '');
 
         if (name === room) {
