@@ -38,7 +38,7 @@ $ /etc/init.d/stun start
 $ stun server_ip
 ```
 
- - 服务器搭建完之后，修改simplewebrtc/simplewebrtc.bundle.js文件即可。
+ - 服务器搭建完之后，修改node_modules/simplewebrtc/simplewebrtc.bundle.js文件即可。
  -- `peerConnectionConfig` 
 
 或者使用docker运行
