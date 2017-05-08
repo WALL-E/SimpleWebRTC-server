@@ -41,4 +41,8 @@ $ stun server_ip
  - 服务器搭建完之后，修改simplewebrtc/simplewebrtc.bundle.js文件即可。
  -- `peerConnectionConfig` 
 
+或者使用docker运行
+```
+docker run -d --name=turnserver --restart="on-failure:10" --net=host -p 3478:3478 -p 3478:3478/udp bprodoehl/turnserver
 
+```
