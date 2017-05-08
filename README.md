@@ -43,6 +43,6 @@ $ stun server_ip
 
 或者使用docker运行
 ```
-docker run -d --name=turnserver --restart="on-failure:10" --net=host -p 3478:3478 -p 3478:3478/udp bprodoehl/turnserver
+docker run -d --name=turnserver --restart="on-failure:10" -p 3478:3478 -p 3478:3478/udp bprodoehl/turnserver
 
 ```
