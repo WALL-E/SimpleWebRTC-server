@@ -38,11 +38,12 @@ $ /etc/init.d/stun start
 $ stun server_ip
 ```
 
- - 服务器搭建完之后，修改node_modules/simplewebrtc/simplewebrtc.bundle.js文件即可。
- -- `peerConnectionConfig` 
+ - 服务器搭建完之后，修改node_modules/simplewebrtc/simplewebrtc.bundle.js文件即可，`peerConnectionConfig` 
 
 或者使用docker运行
 ```
 docker run -d --name=turnserver --restart="on-failure:10" -p 3478:3478 -p 3478:3478/udp bprodoehl/turnserver
 
 ```
+
+**注意：webserver和turnserver不能运行在同一个IP下。**
