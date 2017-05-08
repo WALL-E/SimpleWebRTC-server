@@ -44,5 +44,6 @@ docker run -d --name=turnserver --restart="on-failure:10" -p 3478:3478 -p 3478:3
 
 ```
 
+## 需要注意的地方
 * 服务器搭建完之后，修改node_modules/simplewebrtc/simplewebrtc.bundle.js文件即可，`peerConnectionConfig` 
 * webserver和turnserver不能运行在同一个IP下
